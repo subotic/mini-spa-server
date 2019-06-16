@@ -15,9 +15,18 @@ include_directories(include)
 include_directories(SYSTEM ${CMAKE_BINARY_DIR}/include)
 
 # ------------------------------------------------------------------------------
+# Boost needed by the C++ REST SDK
+# ------------------------------------------------------------------------------
+
+find_package(Boost 1.70.0 COMPONENTS thread REQUIRED)
+
+# ------------------------------------------------------------------------------
 # C++ REST SDK
 # ------------------------------------------------------------------------------
 
+find_package(cpprestsdk REQUIRED cpprest)
+
+#[[
 set(PISTACHE_CMAKE_ARGS -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR})
 
 ExternalProject_Add(
@@ -33,6 +42,7 @@ ExternalProject_Add(
         SOURCE_DIR          ${CMAKE_BINARY_DIR}/external/pistache/src
         BINARY_DIR          ${CMAKE_BINARY_DIR}/external/pistache/build
 )
+]]
 
 # ------------------------------------------------------------------------------
 # Catch
@@ -60,7 +70,7 @@ ExternalProject_Add(
 # Main Executable
 # ------------------------------------------------------------------------------
 
-add_executable(minispaserver src/main.cpp)
-add_dependencies(minispaserver pistache)
 
-# target_link_libraries(minispaserver PRIVATE cpprestsdk::cpprest)
+set(SOURCE_FILES src/main.cpp)
+add_executable(minispaserver ${SOURCE_FILES})
+target_link_libraries(minispaserver PRIVATE cpprestsdk::cpprest ${Boost_LIBRARIES})
